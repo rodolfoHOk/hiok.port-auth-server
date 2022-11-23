@@ -1,4 +1,4 @@
-package br.com.hioktec.portauthserver.config;
+package br.com.hioktec.portauthserver.security.config;
 
 
 import org.springframework.boot.context.properties.ConfigurationProperties;

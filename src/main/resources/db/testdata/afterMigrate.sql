@@ -1,3 +1,5 @@
+delete from oauth2_authorization;
+delete from oauth2_authorization_consent;
 delete from user_group;
 delete from group_role;
 delete from users;

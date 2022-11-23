@@ -52,6 +52,16 @@ main {
 	gap: 16px;
 }
 
+.login-card .form-inputs .error-msg {
+	font-size: 14px;
+	color: #EF4444;
+}
+
+.login-card .form-inputs .info-msg {
+	font-size: 14px;
+	color: #3b82f6;
+}
+
 .login-card .form-input {
 	width: 100%;
 	display: flex;

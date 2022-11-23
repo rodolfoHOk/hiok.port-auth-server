@@ -1,4 +1,4 @@
-package br.com.hioktec.portauthserver.config;
+package br.com.hioktec.portauthserver.security.config;
 
 import java.io.ByteArrayInputStream;
 import java.security.KeyStore;
@@ -70,8 +70,11 @@ public class AuthorizationServerConfig {
 	@Order(2)
 	public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 		http
-			.authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
-			.formLogin(Customizer.withDefaults());
+			.authorizeHttpRequests(authorize ->
+					authorize
+						.requestMatchers("/login", "/css/**").permitAll()
+						.anyRequest().authenticated())
+			.formLogin(customizer -> customizer.loginPage("/login"));
 		return http.build();
 	}
 	

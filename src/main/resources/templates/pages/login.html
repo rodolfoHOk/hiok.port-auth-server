@@ -12,8 +12,8 @@
 		
 		<title>Portfolio Login</title>
 		
-		<link rel="stylesheet" href="../../static/css/reset.css" />
-		<link rel="stylesheet" href="../../static/css/login.css" />
+		<link rel="stylesheet" th:href="@{/css/reset.css}" />
+		<link rel="stylesheet" th:href="@{/css/login.css}" />
 	</head>
 	
 	<body>
@@ -24,21 +24,33 @@
 					<p>Efetue o login</p>
 				</header>
 				
-				<form>
+				<form method="post" th:action="@{/login}">
 					<div class="form-inputs">
 						<div class="form-input">
-							<label for="email">Endereço de e-mail</label>
-							<input name="email" type="text" placeholder="Entre com o e-mail"/>
+							<label for="username">Endereço de e-mail</label>
+							<input id="username" name="username" type="email" placeholder="Entre com o e-mail"/>
 						</div>
 						
 						<div class="form-input">
 							<label for="password">Senha</label>
-							<input name="password" type="password" placeholder="Entre com a senha"/>
+							<input id="password" name="password" type="password" placeholder="Entre com a senha"/>
+						</div>
+						
+						<div class="error-msg" th:if="${param.error}">
+							<p>
+								O e-mail ou senha não confere
+							</p>
+						</div>
+						
+						<div class="info-msg" th:if="${param.logout}">
+							<p>
+								Você foi deslogado
+							</p>
 						</div>
 					</div>
 				
 					<div class="form-actions">
-						<button>Entrar</button>
+						<button type="submit">Entrar</button>
 					</div>
 				</form>
 			</div>

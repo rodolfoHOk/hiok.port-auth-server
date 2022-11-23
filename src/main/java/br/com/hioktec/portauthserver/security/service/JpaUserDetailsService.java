@@ -1,4 +1,4 @@
-package br.com.hioktec.portauthserver.config;
+package br.com.hioktec.portauthserver.security.service;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
