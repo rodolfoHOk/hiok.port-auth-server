@@ -41,6 +41,7 @@ import org.springframework.security.oauth2.server.authorization.token.JwtEncodin
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -57,12 +58,23 @@ public class AuthorizationServerConfig {
 	@Bean
 	@Order(1)
 	public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
-		OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
-		http.getConfigurer(OAuth2AuthorizationServerConfigurer.class).oidc(Customizer.withDefaults());
+		OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
+		
+		authorizationServerConfigurer
+			.authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint.consentPage("/oauth2/consent"))
+			.oidc(Customizer.withDefaults());
+		
+		RequestMatcher endpointsMatcher = authorizationServerConfigurer.getEndpointsMatcher();
+
 		http
-			.exceptionHandling(exceptions ->
+			.securityMatcher(endpointsMatcher)
+			.authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
+			.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
+			.exceptionHandling(exceptions -> 
 				exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
-			.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
+			.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
+			.apply(authorizationServerConfigurer);
+			
 		return http.build();
 	}
 	
@@ -75,6 +87,7 @@ public class AuthorizationServerConfig {
 						.requestMatchers("/login", "/css/**").permitAll()
 						.anyRequest().authenticated())
 			.formLogin(customizer -> customizer.loginPage("/login"));
+		
 		return http.build();
 	}
 	
@@ -98,8 +111,7 @@ public class AuthorizationServerConfig {
 				.redirectUri(properties.getWebRedirectUri())
 				.scope(OidcScopes.OPENID)
 				.scope(OidcScopes.PROFILE)
-				.scope("READ")
-				.scope("WRITE")
+				.scope(OidcScopes.EMAIL)
 				.tokenSettings(TokenSettings
 						.builder()
 						.accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
@@ -172,9 +184,8 @@ public class AuthorizationServerConfig {
 				user.getAuthorities().forEach(authority -> authorities.add(authority.getAuthority()));
 				
 				context.getClaims().claim("user_id", userAccount.getId().toString());
-				context.getClaims().claim("name", userAccount.getName());
-				context.getClaims().claim("email", userAccount.getEmail());
 				context.getClaims().claim("authorities", authorities);
+				context.getClaims().subject(userAccount.getId().toString());
 			}	
 		};
 	}
