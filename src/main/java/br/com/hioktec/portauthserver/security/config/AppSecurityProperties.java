@@ -1,6 +1,5 @@
 package br.com.hioktec.portauthserver.security.config;
 
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
@@ -13,7 +12,7 @@ import lombok.Setter;
 @Setter
 @Validated
 @Component
-@ConfigurationProperties("app.auth")
+@ConfigurationProperties(prefix = "app.auth")
 public class AppSecurityProperties {
 	
 	@NotBlank
