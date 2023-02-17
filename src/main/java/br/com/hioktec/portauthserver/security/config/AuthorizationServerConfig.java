@@ -69,6 +69,7 @@ public class AuthorizationServerConfig {
 		http
 			.securityMatcher(endpointsMatcher)
 			.authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
+			.cors().and()
 			.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
 			.exceptionHandling(exceptions -> 
 				exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
