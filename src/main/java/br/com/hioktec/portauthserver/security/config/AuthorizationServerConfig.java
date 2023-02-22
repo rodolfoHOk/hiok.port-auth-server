@@ -58,7 +58,7 @@ public class AuthorizationServerConfig {
 
 	@Bean
 	@Order(Ordered.HIGHEST_PRECEDENCE)
-	public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain authorizationServerFilterChain(HttpSecurity http) throws Exception {
 		OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
 		
 		authorizationServerConfigurer
@@ -69,30 +69,17 @@ public class AuthorizationServerConfig {
 
 		http
 			.securityMatcher(endpointsMatcher)
-			.authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
 			.cors().and()
 			.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
-			.exceptionHandling(exceptions -> 
-				exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
-			.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
+			.authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
+			.exceptionHandling(exceptions -> exceptions.
+				authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
+			)
 			.apply(authorizationServerConfigurer);
 			
 		return http.build();
 	}
-	
-	@Bean
-	@Order
-	public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-		http
-			.authorizeHttpRequests(authorize ->
-					authorize
-						.requestMatchers("/login", "/css/**").permitAll()
-						.anyRequest().authenticated())
-			.formLogin(customizer -> customizer.loginPage("/login"));
-		
-		return http.build();
-	}
-	
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -191,5 +178,5 @@ public class AuthorizationServerConfig {
 			}	
 		};
 	}
-	
+
 }
